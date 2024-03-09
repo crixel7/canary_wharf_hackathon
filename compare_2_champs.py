@@ -1,31 +1,38 @@
 import requests
-
-def fetch_champion_data(champion_name):
-    # Get the current version of the game
-    response = requests.get('https://ddragon.leagueoflegends.com/api/versions.json')
-    versions = response.json()
-    current_version = versions[0]
-
-    # Get the champion data
-    response = requests.get(f'http://ddragon.leagueoflegends.com/cdn/{current_version}/data/en_US/champion/{champion_name}.json')
-    champion_data = response.json()
-
-    # Extract and return base stats
-    base_stats = champion_data['data'][champion_name]['stats']
-    return base_stats
+from fetch_champion_data import fetch_champion_stats
 
 def compare_champion_stats(champion1, champion2):
+    # Define weights for each stat
+    weights = {
+        'hp': 0.2,
+        'mp': 0.1,
+        'attackdamage': 0.3,
+        'armor': 0.15,
+        'spellblock': 0.15,
+        'movespeed': 0.1
+        # Add more weights as needed
+    }
+
     # Fetch the base stats for both champions
-    stats1 = fetch_champion_data(champion1)
-    stats2 = fetch_champion_data(champion2)
+    stats1 = fetch_champion_stats(champion1)
+    stats2 = fetch_champion_stats(champion2)
 
     # Initialize a dictionary to hold the comparison results
     comparison = {}
+
+    # Initialize the weighted sums
+    weighted_sum1 = 0
+    weighted_sum2 = 0
 
     # Compare the base stats
     for stat in stats1.keys():
         value1 = stats1[stat]
         value2 = stats2[stat]
+
+        # Update the weighted sums
+        if stat in weights:
+            weighted_sum1 += weights[stat] * value1
+            weighted_sum2 += weights[stat] * value2
 
         # Store the comparison result in the dictionary
         comparison[stat] = {
@@ -34,10 +41,13 @@ def compare_champion_stats(champion1, champion2):
             'difference': round(value1 - value2, 1)
         }
 
-    return comparison
+    # Determine the stronger champion
+    stronger_champion = champion1 if weighted_sum1 > weighted_sum2 else champion2
+
+    return comparison, stronger_champion
 
 # Compare the base stats for Gangplank and Ashe
-comparison = compare_champion_stats('Gangplank', 'Ashe')
+comparison, stronger_champion = compare_champion_stats('Gangplank', 'Ashe')
 
 # Print the comparison results
 for stat, data in comparison.items():
@@ -45,3 +55,6 @@ for stat, data in comparison.items():
     print(f"  {data['Gangplank']}")
     print(f"  {data['Ashe']}")
     print(f"  Difference: {data['difference']}")
+
+# Print the stronger champion
+print(f"The stronger champion is {stronger_champion}")

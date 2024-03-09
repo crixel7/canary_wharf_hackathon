@@ -1,6 +1,6 @@
 import requests
 
-def fetch_champion_data(champion_name):
+def fetch_champion_stats(champion_name):
     # Get the current version of the game
     response = requests.get('https://ddragon.leagueoflegends.com/api/versions.json')
     versions = response.json()
@@ -11,7 +11,10 @@ def fetch_champion_data(champion_name):
     champion_data = response.json()
 
     # Extract base stats
-    base_stats = champion_data['data'][champion_name]['stats']
+    stats = champion_data['data'][champion_name]['stats']
+
+    # Return the base stats
+    return stats
 
 # Fetch data for Gangplank
-fetch_champion_data('Gangplank')
+fetch_champion_stats('Gangplank')
