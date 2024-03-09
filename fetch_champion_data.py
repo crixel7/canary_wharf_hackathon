@@ -13,12 +13,5 @@ def fetch_champion_data(champion_name):
     # Extract base stats
     base_stats = champion_data['data'][champion_name]['stats']
 
-    # Extract health and attack damage
-    base_health = base_stats['hp']
-    base_attack_damage = base_stats['attackdamage']
-
-    print(f"{champion_name}'s base health: {base_health}")
-    print(f"{champion_name}'s base attack damage: {base_attack_damage}")
-
 # Fetch data for Gangplank
 fetch_champion_data('Gangplank')
